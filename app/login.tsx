@@ -1,19 +1,22 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
-    Alert,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  Alert,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
+import { allowedUsers } from '../config/users';
 
 export default function Login() {
   const [username, setUsername] = useState('');
   const [passkey, setPasskey] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const handleLogin = async () => {
     if (!username.trim() || !passkey.trim()) {
@@ -22,25 +25,33 @@ export default function Login() {
     }
 
     setIsLoading(true);
-    
-    // Simulate login process
+
     setTimeout(() => {
+      const foundUser = allowedUsers.find(
+        (user) =>
+          user.username.toLowerCase() === username.toLowerCase() &&
+          user.passkey === passkey
+      );
+
       setIsLoading(false);
-      // For now, accept any username/passkey combo
-      console.log('Login attempt:', { username, passkey });
-      // Navigate to main app (you'll create this later)
-      // router.replace('/(tabs)/chats');
-      Alert.alert('Success', 'Login successful!');
+
+      if (foundUser) {
+        // router.replace('/chat');
+        router.replace("/dashboard");
+      } else {
+        Alert.alert('Error', 'Invalid username or passkey');
+      }
     }, 1000);
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        
-        <Text style={styles.title}><MaterialCommunityIcons name="cellphone-text" size={28} color="black" />SilentLink</Text>
-        <Text style={styles.subtitle}>Sign in to continue anonymously</Text>
-        
+        <Text style={styles.title}>
+          <MaterialCommunityIcons name="cellphone-text" size={28} color="black" /> SilentLink
+        </Text>
+        <Text style={styles.subtitle}>Sign in to continue</Text>
+
         <View style={styles.form}>
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Username</Text>
@@ -67,7 +78,7 @@ export default function Login() {
             />
           </View>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
             onPress={handleLogin}
             disabled={isLoading}
@@ -83,15 +94,8 @@ export default function Login() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 32,
-  },
+  container: { flex: 1, backgroundColor: '#fff' },
+  content: { flex: 1, justifyContent: 'center', paddingHorizontal: 32 },
   title: {
     fontSize: 32,
     fontWeight: 'bold',
@@ -105,17 +109,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 48,
   },
-  form: {
-    gap: 24,
-  },
-  inputGroup: {
-    gap: 8,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#333',
-  },
+  form: { gap: 24 },
+  inputGroup: { gap: 8 },
+  label: { fontSize: 16, fontWeight: '500', color: '#333' },
   input: {
     borderWidth: 1,
     borderColor: '#ddd',
@@ -131,12 +127,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 16,
   },
-  loginButtonDisabled: {
-    backgroundColor: '#ccc',
-  },
-  loginButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
+  loginButtonDisabled: { backgroundColor: '#ccc' },
+  loginButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
 });
